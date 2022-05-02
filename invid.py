@@ -7,20 +7,7 @@ BASE_URL = "https://vid.puffyan.us/api/v1"
 
 
 def searchVideos():
-	# parameter list, attach to end of url
-	# not in request body
-	qu = input("Search> ")
-	d = {
-		'q':qu,
-		'page':1,
-		'sort_by':'relevance',
-		'date':'today',
-		'duration':'short',
-		'type':'video',
-		'features':'hd',
-		'region':'US'
-	}
-	ds = json.dumps(d)
+	qu = input("Search> ")	
 	print("searching...")
 	r = requests.get(BASE_URL+"/search?q="+qu)
 	p = r.json()
@@ -47,14 +34,17 @@ def popularVideos():
 def downloadVideo(l):
 	v = requests.get(BASE_URL+"/videos/"+l)
 	p = json.loads(v.text)
-	for t in p['formatStreams']:
-		if(t['resolution'] == '720p'):
-			#print(t['url'])
-			raw = requests.get(t['url'])
-			o = open("video.mp4", "wb+")
-			print("downloading video...")
-			o.write(raw.content)
-			o.close()
+	for t in range(len(p['formatStreams'])):
+		print(str(t) + ") " + p['formatStreams'][t]['resolution'])
+	res = input("Select quality> ")
+	url = p['formatStreams'][int(res)]['url']
+	#print(url)
+	print("downloading video...")
+	raw = requests.get(url)
+	o = open("video.mp4", "wb+")
+	o.write(raw.content)
+	o.close()
+
 
 
 if(len(sys.argv) == 2):
