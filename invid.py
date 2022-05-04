@@ -17,7 +17,7 @@ def searchVideos():
 		except:
 			pass
 	v = input("> ")
-	return e[int(v)]['videoId']
+	return p[int(v)]['videoId']
 	
 
 
