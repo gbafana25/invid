@@ -34,16 +34,27 @@ def popularVideos():
 def downloadVideo(l):
 	v = requests.get(BASE_URL+"/videos/"+l[0])
 	p = json.loads(v.text)
+	#print(p['adaptiveFormats'])
 	for t in range(len(p['formatStreams'])):
 		print(str(t) + ") " + p['formatStreams'][t]['resolution'])
+	print(") [a]udio")
 	res = input("Select quality> ")
-	url = p['formatStreams'][int(res)]['url']
+	url = ""
+	if res == 'a':
+		url = p['adaptiveFormats'][2]['url']
+	else:
+		url = p['formatStreams'][int(res)]['url']
 	#print(url)
 	print("downloading video...")
 	raw = requests.get(url)
-	o = open(l[1]+".mp4", "wb+")
-	o.write(raw.content)
-	o.close()
+	ext = ""
+	if res == 'a':
+		ext = ".mp3"
+	else:
+		ext = ".mp4"
+	with open("video"+ext, "wb+") as o:
+		o.write(raw.content)
+		o.close()
 
 
 
