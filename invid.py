@@ -11,7 +11,7 @@ def searchVideos():
 	print("searching...")
 	r = requests.get(BASE_URL+"/search?q="+qu)
 	p = r.json()
-	for e in range(len(p)):
+	for e in range(10):
 		try:
 			print(str(e) + ")", p[e]['title'] + "  | " + str(round(p[e]['lengthSeconds']/60)) + "min  | " + p[e]['publishedText'])
 		except:
@@ -37,21 +37,11 @@ def downloadVideo(l):
 	#print(p['adaptiveFormats'])
 	for t in range(len(p['formatStreams'])):
 		print(str(t) + ") " + p['formatStreams'][t]['resolution'])
-	print(") [a]udio")
 	res = input("Select quality> ")
-	url = ""
-	if res == 'a':
-		url = p['adaptiveFormats'][2]['url']
-	else:
-		url = p['formatStreams'][int(res)]['url']
-	#print(url)
+	url = p['formatStreams'][int(res)]['url']
 	print("downloading video...")
 	raw = requests.get(url)
-	ext = ""
-	if res == 'a':
-		ext = ".mp3"
-	else:
-		ext = ".mp4"
+	ext = ".mp4"
 	with open("video"+ext, "wb+") as o:
 		o.write(raw.content)
 		o.close()
