@@ -3,7 +3,7 @@ import json
 import requests
 import sys
 
-BASE_URL = "https://vid.puffyan.us/api/v1"
+BASE_URL = "https://inv.riverside.rocks/api/v1"
 
 
 def searchVideos():
@@ -50,8 +50,9 @@ def downloadVideo(l):
 
 if(len(sys.argv) == 2):
 	if(sys.argv[1] == 'search'):
-		vid = searchVideos()
-		downloadVideo(vid)
+		while True:
+			vid = searchVideos()
+			downloadVideo(vid)
 	elif(sys.argv[1] == 'popular'):
 		vid = popularVideos()
 		downloadVideo(vid)
