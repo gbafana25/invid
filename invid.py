@@ -7,7 +7,9 @@ import time
 
 # add list of instances
 #BASE_URL = "https://vid.puffyan.us/api/v1"
-BASE_URL = "https://invidious.slipfox.xyz/api/v1"
+#BASE_URL = "https://invidious.slipfox.xyz/api/v1"
+BASE_URLS = ["https://invidious.slipfox.xyz","https://vid.puffyan.us", "inv.tux.pizza", "invidious.io.lol"]
+URL = ""
 
 # removes characters that cause ffmpeg command to fail
 def sanitizeTitle(name):
@@ -23,13 +25,13 @@ def searchVideos(term):
 	# returns first video from search
 	if(term != None):
 		print("searching...")
-		r = requests.get(BASE_URL+"/search?q="+term)
+		r = requests.get(URL+"/api/v1/search?q="+term)
 		p = r.json()	
 		return (p[0]['videoId'], p[0]['title'])
 
 	qu = input("Search> ")	
 	print("searching...")
-	r = requests.get(BASE_URL+"/search?q="+qu)
+	r = requests.get(URL+"/api/v1/search?q="+qu)
 	p = r.json()
 	count = 0
 	vid_list = []
@@ -49,7 +51,7 @@ def searchVideos(term):
 		
 
 def downloadVideo(l):
-	v = requests.get(BASE_URL+"/videos/"+l[0])
+	v = requests.get(URL+"/api/v1/videos/"+l[0])
 	p = json.loads(v.text)	
 	# list index correlates to video quality 
 	# 0 - usually 144p
@@ -68,7 +70,17 @@ def downloadVideo(l):
 	elif(sys.argv[2] == "video"):
 		print("Keeping as .mp4...")
 
+def testInstances():
+	for i in range(len(BASE_URLS)):
+		try:
+			r = requests.get(BASE_URLS[i])
+			return BASE_URLS[i]
+		except ConnectionError:
+			print(URL+" doesn't work, skipping...")	
+
+
 if(len(sys.argv) >= 2):
+	URL = testInstances()	
 	if(sys.argv[1] == 'search'):
 		while True:
 			vid = searchVideos(None)
