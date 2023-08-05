@@ -13,7 +13,7 @@ URL = ""
 
 # removes characters that cause ffmpeg command to fail
 def sanitizeTitle(name):
-	return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "") 
+	return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "").replace(",", "")
 
 def convertToMp3(name, src):	
 	print(name)
@@ -27,7 +27,7 @@ def searchVideos(term):
 		print("searching...")
 		r = requests.get(URL+"/api/v1/search?q="+term)
 		p = r.json()	
-		return (p[0]['videoId'], p[0]['title'])
+		return (p[0]['videoId'], p[0]['title'], "n")
 
 	qu = input("Search> ")	
 	print("searching...")
@@ -38,8 +38,15 @@ def searchVideos(term):
 	for e in range(10):
 		try:
 			if(p[e]['type'] == "video"):
+				vid_title = ""
+				if(len(p[e]['title']) <= 25):
+					vid_title = p[e]['title']
+				else:
+					vid_title = p[e]['title'][:24]+"..."
+					
+					
+				print(str(count) + ")", vid_title + "|" + p[e]['author'] + "|" + str(round(p[e]['lengthSeconds']/60)) + "min|" + str(p[e]['viewCount']) + "|" + p[e]['publishedText'])
 				vid_list.append((count, e))
-				print(str(count) + ")", p[e]['title'] + "  | " + str(round(p[e]['lengthSeconds']/60)) + "min  | " + p[e]['publishedText'])
 				count += 1
 		except:
 			pass
@@ -47,7 +54,8 @@ def searchVideos(term):
 	v = input("> ")
 	for i in range(len(vid_list)):
 		if vid_list[i][0] == int(v):
-			return (p[vid_list[i][1]]['videoId'], p[vid_list[i][1]]['title'])
+			form = input("Keep as video? [y/n] ").lower()	
+			return (p[vid_list[i][1]]['videoId'], p[vid_list[i][1]]['title'], form)
 		
 
 def downloadVideo(l):
@@ -65,10 +73,16 @@ def downloadVideo(l):
 		o.write(raw.content)
 		o.close()
 
+	if(l[2] == 'y'):
+		print("Keeping as .mp4...")
+	elif(l[2] == 'n'):
+		convertToMp3(filename, filename+ext)
+	"""
 	if(len(sys.argv) == 2):
 		convertToMp3(filename, filename+ext)
 	elif(sys.argv[2] == "video"):
 		print("Keeping as .mp4...")
+	"""
 
 def testInstances():
 	for i in range(len(BASE_URLS)):
