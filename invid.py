@@ -13,7 +13,7 @@ URL = ""
 
 # removes characters that cause ffmpeg command to fail
 def sanitizeTitle(name):
-	return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '') 
+	return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "") 
 
 def convertToMp3(name, src):	
 	print(name)
