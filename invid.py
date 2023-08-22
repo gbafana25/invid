@@ -8,12 +8,20 @@ import time
 # add list of instances
 #BASE_URL = "https://vid.puffyan.us/api/v1"
 #BASE_URL = "https://invidious.slipfox.xyz/api/v1"
-BASE_URLS = ["https://invidious.slipfox.xyz","https://vid.puffyan.us", "inv.tux.pizza", "invidious.io.lol"]
+BASE_URLS = ["https://vid.puffyan.us","inv.tux.pizza", "invidious.io.lol"]
 URL = ""
 
 # removes characters that cause ffmpeg command to fail
 def sanitizeTitle(name):
-	return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "").replace(",", "")
+    newname = ''
+    for i in range(len(name)):
+        if(name[i] >= 'A' and name[i] <= 'z'):
+            #name[i] = ''
+            newname+=name[i]
+
+    return newname
+    #return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "").replace(",", "")
+
 
 def convertToMp3(name, src):	
 	print(name)
