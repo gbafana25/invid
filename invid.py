@@ -8,7 +8,7 @@ import time
 # add list of instances
 #BASE_URL = "https://vid.puffyan.us/api/v1"
 #BASE_URL = "https://invidious.slipfox.xyz/api/v1"
-BASE_URLS = ["https://vid.puffyan.us","inv.tux.pizza", "invidious.io.lol"]
+BASE_URLS = ["https://vid.puffyan.us","https://inv.tux.pizza", "https://invidious.io.lol"]
 URL = ""
 
 # removes characters that cause ffmpeg command to fail
@@ -21,6 +21,9 @@ def sanitizeTitle(name):
 
     return newname
     #return name.replace(' ', '-').replace('&', '').replace('(', '').replace(')', '').replace("\"", "").replace(":", "").replace(",", "")
+
+def slugTerm(term):
+	return term.replace(" ", '-')
 
 
 def convertToMp3(name, src):	
@@ -35,7 +38,7 @@ def searchVideos(term):
 		print("searching...")
 		r = requests.get(URL+"/api/v1/search?q="+term)
 		p = r.json()	
-		return (p[0]['videoId'], p[0]['title'], "n")
+		return (p[0]['videoId'], p[0]['title'], "n", slugTerm(term))
 
 	qu = input("Search> ")	
 	print("searching...")
@@ -63,7 +66,7 @@ def searchVideos(term):
 	for i in range(len(vid_list)):
 		if vid_list[i][0] == int(v):
 			form = input("Keep as video? [y/n] ").lower()	
-			return (p[vid_list[i][1]]['videoId'], p[vid_list[i][1]]['title'], form)
+			return (p[vid_list[i][1]]['videoId'], p[vid_list[i][1]]['title'], form, p[vid_list[i][1]]['videoId'])
 		
 
 def downloadVideo(l):
@@ -76,7 +79,7 @@ def downloadVideo(l):
 	print("downloading video...")
 	raw = requests.get(url)
 	ext = ".mp4"
-	filename = sanitizeTitle(l[1])
+	filename = l[3].strip()
 	with open(filename+ext, "wb+") as o:
 		o.write(raw.content)
 		o.close()
@@ -100,6 +103,23 @@ def testInstances():
 		except ConnectionError:
 			print(URL+" doesn't work, skipping...")	
 
+def savetoPlaylist(vid_id):
+	data = None
+	if os.path.exists("playlist.json") == False:
+		with open("playlist.json", "w+") as p:
+			d = {
+				'idList': []
+			}
+			json.dump(d, p)
+
+	with open("playlist.json", "r") as p:
+		data = json.load(p)
+		data['idList'].append(vid_id)
+
+	with open("playlist.json", "w") as p:
+		json.dump(data, p)
+
+
 
 if(len(sys.argv) >= 2):
 	URL = testInstances()	
@@ -107,11 +127,13 @@ if(len(sys.argv) >= 2):
 		while True:
 			vid = searchVideos(None)
 			downloadVideo(vid)
+			savetoPlaylist(vid[0])
 	elif(sys.argv[1] == 'from-list'):
 		with open("search-terms", "r") as searches:
 			for search in searches:
 				vid = searchVideos(search)
 				downloadVideo(vid)
+				savetoPlaylist(vid[0])
 				print("5 second delay for rate limit")
 				time.sleep(5)
 	
