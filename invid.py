@@ -136,6 +136,11 @@ if(len(sys.argv) >= 2):
 				savetoPlaylist(vid[0])
 				print("5 second delay for rate limit")
 				time.sleep(5)
+	elif(sys.argv[1] == 'restore-playlist'):
+		with open("playlist.json", "r") as playlist:
+			data = json.load(playlist)
+			for id in data['idList']:
+				downloadVideo((id, id, "n", id))
 	
 else:
 	print("type a command...")
